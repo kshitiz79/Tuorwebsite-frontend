@@ -4,10 +4,10 @@ import { destination_list } from "../../assets/assets";
 
 function ExploreDestination() {
   return (
-    <div className="bg-gray-100 mt-[60rem]">
+    <div className="bg-gray-100 mt-[80rem] lg:mt-[100rem]">
       {/* Header Section */}
       <div className="bg-cover bg-center h-[40vh] flex items-center justify-center bg-[url('../../assets/destination-banner.jpg')]">
-        <h1 className="text-white text-4xl font-bold">Explore Our Destinations</h1>
+        <h1 className="text-black text-4xl font-bold">Explore Our Destinations</h1>
       </div>
 
       {/* Destination List Section */}
