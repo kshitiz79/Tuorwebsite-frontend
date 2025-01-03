@@ -1,11 +1,51 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./LoginPage.css";
 import cross_icon from "../../assets/cross_icon.png";
 
 function LoginPage() {
   const [currState, setCurrState] = useState("Login");
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    console.log("Form data being sent:", formData);
+  
+    try {
+      const endpoint =
+        currState === "Sign Up"
+          ? "http://localhost:4000/api/auth/signup"
+          : "http://localhost:4000/api/auth/login";
+  
+      const response = await axios.post(endpoint, formData);
+  
+      console.log("API Response:", response.data);
+  
+      if (response.data.success) {
+        alert(`${currState} successful!`);
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("role", response.data.role || "user");
+        navigate("/"); // Redirect after successful login
+      } else {
+        setErrorMessage(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error during form submission:", error.response?.data?.message || error.message);
+      setErrorMessage(error.response?.data?.message || "An error occurred");
+    }
+  };
+  
 
   const handleClose = () => {
     navigate("/"); // Navigate to the home page
@@ -13,7 +53,7 @@ function LoginPage() {
 
   return (
     <div className="login-popup">
-      <form className="login-popup-container">
+      <form className="login-popup-container" onSubmit={handleSubmit}>
         <div className="login-popup-title">
           <h2>{currState}</h2>
           <img
@@ -24,17 +64,42 @@ function LoginPage() {
           />
         </div>
         <div className="login-popup-inputs">
-          {currState === "Sign Up" && <input type="text" placeholder="Your name" required />}
-          <input type="email" placeholder="Your email" required />
-          <input type="password" placeholder="Password" required />
+          {currState === "Sign Up" && (
+            <input
+              type="text"
+              name="name"
+              placeholder="Your name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+            />
+          )}
+          <input
+            type="email"
+            name="email"
+            placeholder="Your email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
+          />
         </div>
-        <button className="submit-button">
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        <button type="submit" className="submit-button bg-green-600">
           {currState === "Sign Up" ? "Create account" : "Login"}
         </button>
         <div className="login-popup-condition">
           <input type="checkbox" required />
           <p>
-            By continuing, I agree to the <a href="#">terms of use</a> & <a href="#">privacy policy</a>.
+            By continuing, I agree to the <a href="#">terms of use</a> &{" "}
+            <a href="#">privacy policy</a>.
           </p>
         </div>
         <div className="login-click-button">
@@ -59,7 +124,7 @@ function LoginPage() {
                   e.preventDefault();
                   setCurrState("Login");
                 }}
-                className="toggle-link"
+                className="toggle-link "
               >
                 Login here
               </button>
@@ -72,8 +137,3 @@ function LoginPage() {
 }
 
 export default LoginPage;
-
-
-
-
-
